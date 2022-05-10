@@ -27,7 +27,11 @@ while (camera.isOpened()):
 img_target=open(r'target.jpg', 'rb')
 response_face_target = face_client.face.detect_with_stream(
     image=img_target,detection_model='detection_03', recognition_model='recognition_04')
-face_id_target = response_face_target[0].face_id
+
+if not response_face_target:
+    raise Exception('No face detected')
+else:
+    face_id_target = response_face_target[0].face_id
 
 with os.scandir('.\DB') as ficheros:
     ficheros = [fichero.name for fichero in ficheros if fichero.is_file() and fichero.name.endswith('.jpg')]
@@ -39,12 +43,19 @@ for fichero in ficheros:
     face_verified = face_client.face.verify_face_to_face(face_id1=face_id_source,
         face_id2=face_id_target)
     if face_verified.is_identical:
-        print('El rostro de la persona es: ' + fichero)
-        print(face_verified.is_identical)
-        print(face_verified.confidence)
-        break
+        img=Image.open("target.jpg")
+        draw = ImageDraw.Draw(img)
+        for face in response_face_target:
+              rect = face.face_rectangle
+              left = rect.left
+              top = rect.top
+              right = rect.width + left
+              bottom = rect.height + top
+              draw.rectangle(((left, top), (right, bottom)), outline='green', width=5)
+              break
     else:
         print('No se encontro el rostro de la persona')
         print(face_verified.is_identical)
         print(face_verified.confidence)
         face_id_target.faceRectangle
+img.show()
