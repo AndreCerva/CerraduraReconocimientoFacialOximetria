@@ -45,14 +45,17 @@ for fichero in ficheros:
     if face_verified.is_identical:
         img=Image.open("target.jpg")
         draw = ImageDraw.Draw(img)
+        font = ImageFont.truetype("arial.ttf", 15)
         for face in response_face_target:
               rect = face.face_rectangle
               left = rect.left
               top = rect.top
               right = rect.width + left
               bottom = rect.height + top
+              fichero=fichero.split(".")
               draw.rectangle(((left, top), (right, bottom)), outline='green', width=5)
-              break
+              draw.text((50, 50),f"Persona: {fichero[0]}\nSeguridad: {face_verified.confidence}", font=font, fill="white")
+        break
     else:
         print('No se encontro el rostro de la persona')
         print(face_verified.is_identical)
